@@ -143,6 +143,7 @@ function thirty3TelemetryApiPlugin(): Plugin {
 
 export default defineConfig(() => {
   return {
+    base: './',
     plugins: [react(), tailwindcss(), thirty3TelemetryApiPlugin()],
     resolve: {
       alias: {

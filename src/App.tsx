@@ -11,6 +11,7 @@ import { Header } from './components/Header';
 import { PnLTelemetryTable } from './components/PnLTelemetryTable';
 import { RecursiveHealingWidget } from './components/RecursiveHealingWidget';
 import { SquadsShowcase } from './components/SquadsShowcase';
+import { FAQSection } from './components/FAQSection';
 import { LookerStudioEmbed } from './components/LookerStudioEmbed';
 import { AudioPlayerSection } from './components/AudioPlayerSection';
 import { ToastContainer } from 'react-toastify';
@@ -204,7 +205,12 @@ export default function App() {
           <SquadsShowcase />
         </section>
 
-        {/* 5. GOOGLE LOOKER STUDIO & EXPORT CSV GOOGLE SHEETS */}
+        {/* 5. FOIRE AUX QUESTIONS (FAQ) · GARANTIES, DÉLAIS & SUPPORT */}
+        <section id="faq">
+          <FAQSection />
+        </section>
+
+        {/* 6. GOOGLE LOOKER STUDIO & EXPORT CSV GOOGLE SHEETS */}
         <section id="looker">
           <LookerStudioEmbed telemetry={telemetry} />
         </section>

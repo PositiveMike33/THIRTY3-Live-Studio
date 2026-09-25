@@ -74,6 +74,14 @@ export const Header: React.FC<HeaderProps> = ({
             Trio Marketing & Escouades
           </button>
           <button
+            onClick={() => onNavigateSection('faq')}
+            className={`transition-colors hover:text-white ${
+              activeSection === 'faq' ? 'text-cyan-400 font-semibold' : ''
+            }`}
+          >
+            FAQ & Garanties
+          </button>
+          <button
             onClick={() => onNavigateSection('looker')}
             className={`transition-colors hover:text-white ${
               activeSection === 'looker' ? 'text-cyan-400 font-semibold' : ''
