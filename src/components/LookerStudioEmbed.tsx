@@ -224,47 +224,54 @@ export const LookerStudioEmbed: React.FC<LookerStudioEmbedProps> = ({ telemetry 
         </div>
       )}
 
-      {/* Vue 2 : Iframe Looker Studio */}
+      {/* Vue 2 : Iframe Google Studio & Looker Studio */}
       {activeTab === 'iframe' && (
-        <div className="w-full h-[550px] rounded-lg border border-slate-800 overflow-hidden relative bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
-          <div className="max-w-md space-y-4">
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto">
-              <BarChart3 className="w-6 h-6 text-emerald-400" />
-            </div>
-            <div>
-              <h3 className="font-display font-bold text-lg text-white">
-                Connecteur Google Looker Studio Dédié
-              </h3>
-              <p className="text-xs text-slate-400 mt-1">
-                L'URL de synchronisation directe est prête. Vous pouvez lier n'importe quel rapport Looker Studio
-                à la source de données CSV fournie par l'Engine local THIRTY3.
-              </p>
-            </div>
-
-            <div className="p-3 bg-slate-900 rounded-lg border border-slate-800 text-left">
-              <div className="text-[11px] text-slate-400 mb-1 font-semibold">Formule Google Sheets recommandée :</div>
-              <div className="font-mono-tabular text-xs text-cyan-300 break-all select-all">
-                {importFormula}
-              </div>
-            </div>
-
-            <div className="flex items-center justify-center gap-3">
-              <button
-                onClick={handleCopyFormula}
-                className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-semibold text-xs transition-colors"
-              >
-                {copied ? 'Copié !' : 'Copier la formule'}
-              </button>
+        <div className="w-full rounded-lg border border-slate-800 overflow-hidden bg-slate-950 flex flex-col">
+          {/* Top domain bar */}
+          <div className="px-4 py-2.5 bg-slate-900 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-slate-400">Domaine Google Studio Actif :</span>
               <a
-                href="https://lookerstudio.google.com"
+                href="https://thirty3-trio-agents-engine-6669.ai.studio"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition-colors"
+                className="font-mono text-cyan-300 hover:underline flex items-center gap-1 font-semibold"
               >
-                <span>Ouvrir Looker Studio</span>
-                <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                https://thirty3-trio-agents-engine-6669.ai.studio
+                <ExternalLink className="w-3 h-3 text-cyan-400" />
               </a>
             </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleCopyFormula}
+                className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-medium border border-slate-700 transition-colors flex items-center gap-1"
+              >
+                {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                <span>{copied ? 'Formule Copiée !' : 'Copier Formule IMPORTDATA'}</span>
+              </button>
+              <a
+                href="https://thirty3-trio-agents-engine-6669.ai.studio"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-2.5 py-1 rounded bg-cyan-600 hover:bg-cyan-500 text-slate-950 text-[11px] font-bold transition-colors flex items-center gap-1"
+              >
+                <span>Plein Écran</span>
+                <ExternalLink className="w-3 h-3 text-slate-950" />
+              </a>
+            </div>
+          </div>
+
+          {/* Iframe View */}
+          <div className="w-full h-[620px] relative bg-slate-950">
+            <iframe
+              src="https://thirty3-trio-agents-engine-6669.ai.studio"
+              title="Google AI Studio THIRTY3 Live Engine"
+              className="w-full h-full border-0"
+              allow="clipboard-write; camera; microphone; encrypted-media"
+              loading="lazy"
+            />
           </div>
         </div>
       )}
