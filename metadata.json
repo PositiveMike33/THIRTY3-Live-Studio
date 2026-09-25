@@ -1,0 +1,6 @@
+{
+  "name": "THIRTY3 - Live Studio Dashboard & Trio-Agents Engine",
+  "description": "Tableau de bord exécutif et vitrine officielle des 3 escouades d'agents IA autonomes : Sovereign MCP Lab, CogniFlow Systems et FinOps Matrix pour Michael Gauthier Guillet.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
