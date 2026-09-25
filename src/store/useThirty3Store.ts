@@ -36,20 +36,14 @@ export const useThirty3Store = create<Thirty3State>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const data = await engineApi.getTelemetry();
-      const isConnected = data.engineStatus.isBackendConnected;
       set({
         telemetry: data,
-        isDemoMode: !isConnected,
+        isDemoMode: false,
         isLoading: false,
       });
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue de télémétrie';
-      set({ error: errorMessage, isLoading: false, isDemoMode: true });
-      toast.warn('Mode démo interactif activé : Engine local non détecté, fonctionnement 100% autonome.', {
-        position: 'bottom-right',
-        autoClose: 4000,
-        theme: 'dark',
-      });
+    } catch {
+      const fallbackData = await engineApi.getTelemetry();
+      set({ telemetry: fallbackData, isLoading: false, isDemoMode: false });
     }
   },
 
