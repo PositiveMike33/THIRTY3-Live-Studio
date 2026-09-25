@@ -45,8 +45,8 @@ export const PnLTelemetryTable: React.FC<PnLTelemetryTableProps> = ({
   const [hasScrolledRight, setHasScrolledRight] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [chartViewMode, setChartViewMode] = useState<
-    'ca_brut' | 'squads' | 'microservices' | 'timeline'
-  >('ca_brut');
+    'squads' | 'ca_brut' | 'microservices' | 'timeline'
+  >('squads');
 
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -92,28 +92,55 @@ export const PnLTelemetryTable: React.FC<PnLTelemetryTableProps> = ({
 
   const { squads, summary } = telemetry;
 
-  // Données Recharts 1 : Répartition directe par escouade (30 derniers jours)
+  // Données Recharts 1 : Répartition directe du CA Brut par escouade (30 derniers jours)
   const squadChartData = squads.map((sq) => {
     const sharePercentage =
       summary.totalGrossCAD > 0
         ? Math.round((sq.grossRevenueCAD / summary.totalGrossCAD) * 1000) / 10
         : 0;
 
+    const isSovereign = sq.id === 'sovereign-mcp';
+    const isCogniFlow = sq.id === 'cogniflow';
+
+    const modelBadge = isSovereign
+      ? 'Parnas (1972)'
+      : isCogniFlow
+      ? 'ToT (Tree-of-Thoughts)'
+      : 'Colibrì MoE';
+
+    const modelName = isSovereign
+      ? 'Parnas · Isolation Modulaire'
+      : isCogniFlow
+      ? 'ToT · Auto-Guérison 3-Essais'
+      : 'MoE · Routage Spéculatif';
+
+    const modelTechForce = isSovereign
+      ? 'Étanchéité Parnas (1972) · Isolation contextes & tokens maîtres scellés SHA-256, zéro fuite LLM'
+      : isCogniFlow
+      ? 'Tree-of-Thoughts (ToT) Récursif · Auto-guérison 3 paliers stricts > 99.8%, zéro arrêt de production'
+      : 'Colibrì MoE Speculative Router · Arbitrage multi-modèles (Mixtral/Llama/GPT), économie -60% à -80% API';
+
     return {
+      id: sq.id,
       name: sq.name,
       shortName: sq.name.replace(' Systems', '').replace(' Matrix', '').replace(' Lab', ''),
       CA_Brut_CAD: Math.round(sq.grossRevenueCAD * 100) / 100,
       caBrut: Math.round(sq.grossRevenueCAD * 100) / 100,
       netMichael: Math.round(sq.netMichaelCAD * 100) / 100,
       pertesEvitees: Math.round(sq.lossesAvoidedCAD * 100) / 100,
+      modelValueCAD: Math.round(sq.lossesAvoidedCAD * 100) / 100,
+      modelBadge,
+      modelName,
+      modelTechForce,
       orders: sq.ordersDelivered,
       share: sharePercentage,
-      color:
-        sq.id === 'sovereign-mcp'
-          ? '#06b6d4'
-          : sq.id === 'cogniflow'
-          ? '#10b981'
-          : '#a855f7',
+      color: isSovereign
+        ? 'url(#cyanGrad)'
+        : isCogniFlow
+        ? 'url(#emeraldGrad)'
+        : 'url(#slateGrad)',
+      rawColor: isSovereign ? '#06b6d4' : isCogniFlow ? '#10b981' : '#64748b',
+      strokeColor: isSovereign ? '#22d3ee' : isCogniFlow ? '#34d399' : '#94a3b8',
     };
   });
 
@@ -152,28 +179,57 @@ export const PnLTelemetryTable: React.FC<PnLTelemetryTableProps> = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CustomChartTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
+      const firstPayload = payload[0]?.payload;
+      const modelBadge = firstPayload?.modelBadge;
+      const modelTechForce = firstPayload?.modelTechForce;
+
       return (
-        <div className="bg-slate-950/95 border border-slate-700/80 p-3 rounded-lg shadow-xl text-xs backdrop-blur-md">
+        <div className="bg-slate-950/95 border border-slate-700/80 p-3 rounded-lg shadow-xl text-xs backdrop-blur-md max-w-sm">
           <div className="font-semibold text-slate-200 mb-1.5 border-b border-slate-800 pb-1 flex items-center justify-between gap-2">
             <span>{label}</span>
+            {modelBadge && (
+              <span className="text-[10px] font-mono-tabular font-bold px-1.5 py-0.5 rounded bg-purple-950/80 border border-purple-800/60 text-purple-300">
+                {modelBadge}
+              </span>
+            )}
           </div>
           <div className="space-y-1">
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            {payload.map((entry: any, index: number) => (
-              <div key={`item-${index}`} className="flex items-center justify-between gap-4 font-mono-tabular">
-                <span className="flex items-center gap-1.5 text-slate-300">
-                  <span
-                    className="w-2 h-2 rounded-full shrink-0"
-                    style={{ backgroundColor: entry.color || entry.fill }}
-                  />
-                  <span>{entry.name}:</span>
-                </span>
-                <span className="font-bold text-white">
-                  {typeof entry.value === 'number' ? `${entry.value.toFixed(2)} $ CAD` : entry.value}
-                </span>
-              </div>
-            ))}
+            {payload.map((entry: any, index: number) => {
+              const dotColor =
+                entry.payload?.rawColor ||
+                (typeof entry.fill === 'string' && !entry.fill.startsWith('url')
+                  ? entry.fill
+                  : typeof entry.color === 'string' && !entry.color.startsWith('url')
+                  ? entry.color
+                  : '#38bdf8');
+
+              return (
+                <div key={`item-${index}`} className="flex items-center justify-between gap-4 font-mono-tabular">
+                  <span className="flex items-center gap-1.5 text-slate-300">
+                    <span
+                      className="w-2.5 h-2.5 rounded-full shrink-0 border border-slate-600/50"
+                      style={{ backgroundColor: dotColor }}
+                    />
+                    <span>{entry.name}:</span>
+                  </span>
+                  <span className="font-bold text-white">
+                    {typeof entry.value === 'number' ? `${entry.value.toFixed(2)} $ CAD` : entry.value}
+                  </span>
+                </div>
+              );
+            })}
           </div>
+
+          {modelTechForce && (
+            <div className="mt-2 pt-2 border-t border-slate-800 text-[10px] leading-relaxed">
+              <span className="text-purple-300 font-semibold flex items-center gap-1 mb-0.5">
+                <Sparkles className="w-3 h-3 text-purple-400 shrink-0" />
+                Force Unique ({modelBadge}) :
+              </span>
+              <p className="text-slate-400">{modelTechForce}</p>
+            </div>
+          )}
         </div>
       );
     }
@@ -281,6 +337,17 @@ export const PnLTelemetryTable: React.FC<PnLTelemetryTableProps> = ({
           {/* Boutons de bascule de vue de graphique */}
           <div className="flex flex-wrap items-center gap-1.5 self-start sm:self-auto bg-slate-900 p-1 rounded-lg border border-slate-800">
             <button
+              onClick={() => setChartViewMode('squads')}
+              className={`px-2.5 py-1 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${
+                chartViewMode === 'squads'
+                  ? 'bg-cyan-600 text-slate-950 font-bold shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>Comparatif 3 Barres (Parnas · ToT · MoE)</span>
+            </button>
+            <button
               onClick={() => setChartViewMode('ca_brut')}
               className={`px-2.5 py-1 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${
                 chartViewMode === 'ca_brut'
@@ -292,17 +359,6 @@ export const PnLTelemetryTable: React.FC<PnLTelemetryTableProps> = ({
               <span>Répartition CA Brut (30j)</span>
             </button>
             <button
-              onClick={() => setChartViewMode('squads')}
-              className={`px-2.5 py-1 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${
-                chartViewMode === 'squads'
-                  ? 'bg-cyan-600 text-slate-950 font-bold shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span>Comparatif 3 Barres</span>
-            </button>
-            <button
               onClick={() => setChartViewMode('microservices')}
               className={`px-2.5 py-1 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${
                 chartViewMode === 'microservices'
@@ -311,7 +367,7 @@ export const PnLTelemetryTable: React.FC<PnLTelemetryTableProps> = ({
               }`}
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>3 Micro-Services</span>
+              <span>3 Micro-Services Dédiés</span>
             </button>
             <button
               onClick={() => setChartViewMode('timeline')}
@@ -331,106 +387,189 @@ export const PnLTelemetryTable: React.FC<PnLTelemetryTableProps> = ({
         <div className="w-full pt-2">
           {chartViewMode === 'ca_brut' ? (
             /* Bar Chart dédié : Répartition du CA Brut (CA_Brut_CAD) des 3 escouades sur 30 jours */
-            <div className="h-[290px] sm:h-[320px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={squadChartData}
-                  margin={{ top: 25, right: 15, left: -10, bottom: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                  <XAxis
-                    dataKey="name"
-                    stroke="#64748b"
-                    tick={{ fill: '#cbd5e1', fontSize: 11 }}
-                    tickLine={{ stroke: '#334155' }}
-                  />
-                  <YAxis
-                    stroke="#64748b"
-                    tick={{ fill: '#94a3b8', fontSize: 11 }}
-                    tickLine={{ stroke: '#334155' }}
-                    tickFormatter={(val) => `${val} $`}
-                  />
-                  <Tooltip content={<CustomChartTooltip />} />
-                  <Bar
-                    dataKey="CA_Brut_CAD"
-                    name="Chiffre d'Affaires Brut (CA_Brut_CAD)"
-                    radius={[6, 6, 0, 0]}
-                    maxBarSize={64}
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    label={{
-                      position: 'top',
-                      fill: '#38bdf8',
-                      fontSize: 12,
-                      fontWeight: 700,
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      formatter: (val: any) =>
-                        typeof val === 'number' ? `${val.toFixed(2)} $` : `${val} $`,
-                    }}
+            <div className="space-y-3">
+              <div className="h-[290px] sm:h-[320px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={squadChartData}
+                    margin={{ top: 25, right: 15, left: -10, bottom: 20 }}
                   >
-                    {squadChartData.map((entry, index) => (
-                      <Cell key={`cell-brut-${index}`} fill={entry.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+                    <defs>
+                      <linearGradient id="cyanGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#22d3ee" stopOpacity={0.95} />
+                        <stop offset="100%" stopColor="#0891b2" stopOpacity={0.75} />
+                      </linearGradient>
+                      <linearGradient id="emeraldGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#34d399" stopOpacity={0.95} />
+                        <stop offset="100%" stopColor="#059669" stopOpacity={0.75} />
+                      </linearGradient>
+                      <linearGradient id="slateGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#94a3b8" stopOpacity={0.95} />
+                        <stop offset="100%" stopColor="#475569" stopOpacity={0.75} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                    <XAxis
+                      dataKey="name"
+                      stroke="#64748b"
+                      tick={{ fill: '#cbd5e1', fontSize: 11 }}
+                      tickLine={{ stroke: '#334155' }}
+                    />
+                    <YAxis
+                      stroke="#64748b"
+                      tick={{ fill: '#94a3b8', fontSize: 11 }}
+                      tickLine={{ stroke: '#334155' }}
+                      tickFormatter={(val) => `${val} $`}
+                    />
+                    <Tooltip content={<CustomChartTooltip />} />
+                    <Bar
+                      dataKey="CA_Brut_CAD"
+                      name="Chiffre d'Affaires Brut (CA_Brut_CAD)"
+                      radius={[6, 6, 0, 0]}
+                      maxBarSize={64}
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      label={{
+                        position: 'top',
+                        fill: '#38bdf8',
+                        fontSize: 12,
+                        fontWeight: 700,
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        formatter: (val: any) =>
+                          typeof val === 'number' ? `${val.toFixed(2)} $` : `${val} $`,
+                      }}
+                    >
+                      {squadChartData.map((entry, index) => (
+                        <Cell
+                          key={`cell-brut-${index}`}
+                          fill={entry.color}
+                          stroke={entry.strokeColor}
+                          strokeWidth={1}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Synthèse responsive des 3 Escouades aux tons Cyan, Émeraude et Ardoise */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                {squadChartData.map((sq, idx) => (
+                  <div
+                    key={`summary-brut-${idx}`}
+                    className={`p-2.5 rounded-lg border flex items-center justify-between font-mono-tabular text-xs transition-colors ${
+                      sq.id === 'sovereign-mcp'
+                        ? 'bg-cyan-950/30 border-cyan-800/40 text-cyan-200 hover:border-cyan-500/60'
+                        : sq.id === 'cogniflow'
+                        ? 'bg-emerald-950/30 border-emerald-800/40 text-emerald-200 hover:border-emerald-500/60'
+                        : 'bg-slate-900/60 border-slate-700/50 text-slate-200 hover:border-slate-500/60'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="w-2.5 h-2.5 rounded-full shrink-0 border border-slate-600/40"
+                        style={{ backgroundColor: sq.rawColor }}
+                      />
+                      <span className="font-semibold text-slate-200 font-sans truncate max-w-[130px]">
+                        {sq.name}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-bold">{sq.CA_Brut_CAD.toFixed(2)} $</span>
+                      <span className="text-[10px] text-slate-400 ml-1.5 font-sans">({sq.share}%)</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : chartViewMode === 'squads' ? (
-            <div className="h-[290px] sm:h-[320px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={squadChartData}
-                  margin={{ top: 10, right: 10, left: -15, bottom: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                  <XAxis
-                    dataKey="shortName"
-                    stroke="#64748b"
-                    tick={{ fill: '#94a3b8', fontSize: 11 }}
-                    tickLine={{ stroke: '#334155' }}
-                  />
-                  <YAxis
-                    stroke="#64748b"
-                    tick={{ fill: '#94a3b8', fontSize: 11 }}
-                    tickLine={{ stroke: '#334155' }}
-                    tickFormatter={(val) => `${val} $`}
-                  />
-                  <Tooltip content={<CustomChartTooltip />} />
-                  <Legend
-                    wrapperStyle={{ paddingTop: 10, fontSize: 11 }}
-                    formatter={(value) => <span className="text-slate-300 text-xs">{value}</span>}
-                  />
-                  <Bar
-                    dataKey="caBrut"
-                    name="Chiffre d'Affaires Brut"
-                    fill="#06b6d4"
-                    radius={[4, 4, 0, 0]}
-                    maxBarSize={32}
-                  />
-                  <Bar
-                    dataKey="netMichael"
-                    name="Net Michael (après 27,175%)"
-                    fill="#10b981"
-                    radius={[4, 4, 0, 0]}
-                    maxBarSize={32}
-                  />
-                  <Bar
-                    dataKey="pertesEvitees"
-                    name="Force Modèle (Économies & Pertes Évitées)"
-                    fill="#a855f7"
-                    radius={[4, 4, 0, 0]}
-                    maxBarSize={32}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="space-y-3">
+              <div className="h-[290px] sm:h-[320px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={squadChartData}
+                    margin={{ top: 10, right: 10, left: -15, bottom: 20 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                    <XAxis
+                      dataKey="shortName"
+                      stroke="#64748b"
+                      tick={{ fill: '#94a3b8', fontSize: 11 }}
+                      tickLine={{ stroke: '#334155' }}
+                    />
+                    <YAxis
+                      stroke="#64748b"
+                      tick={{ fill: '#94a3b8', fontSize: 11 }}
+                      tickLine={{ stroke: '#334155' }}
+                      tickFormatter={(val) => `${val} $`}
+                    />
+                    <Tooltip content={<CustomChartTooltip />} />
+                    <Legend
+                      wrapperStyle={{ paddingTop: 10, fontSize: 11 }}
+                      formatter={(value) => <span className="text-slate-300 text-xs">{value}</span>}
+                    />
+                    <Bar
+                      dataKey="caBrut"
+                      name="1. CA Brut (CAD)"
+                      fill="#06b6d4"
+                      radius={[4, 4, 0, 0]}
+                      maxBarSize={30}
+                    />
+                    <Bar
+                      dataKey="netMichael"
+                      name="2. Net Michael (-27,175%)"
+                      fill="#10b981"
+                      radius={[4, 4, 0, 0]}
+                      maxBarSize={30}
+                    />
+                    <Bar
+                      dataKey="pertesEvitees"
+                      name="3. Force Modèle Spécifique (Parnas / ToT / MoE)"
+                      fill="#a855f7"
+                      radius={[4, 4, 0, 0]}
+                      maxBarSize={30}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Cartes détaillant les Forces Techniques Uniques (Parnas, ToT, MoE) de chaque Micro-Service */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                {squadChartData.map((sq, idx) => (
+                  <div
+                    key={`tech-force-${idx}`}
+                    className="p-3 rounded-lg bg-slate-950/80 border border-purple-900/40 hover:border-purple-500/50 transition-colors flex flex-col justify-between space-y-2 text-xs"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-1 mb-1">
+                        <span className="font-bold text-white truncate">{sq.name}</span>
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono-tabular font-bold bg-purple-950/90 border border-purple-800/60 text-purple-300">
+                          {sq.modelBadge}
+                        </span>
+                      </div>
+                      <div className="text-[11px] font-semibold text-purple-300 flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-purple-400 shrink-0" />
+                        <span>Force : {sq.modelName}</span>
+                      </div>
+                      <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">
+                        {sq.modelTechForce}
+                      </p>
+                    </div>
+                    <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-mono-tabular">
+                      <span className="text-slate-400">Pertes Évitées & Économies :</span>
+                      <span className="font-bold text-purple-300">+{sq.pertesEvitees.toFixed(2)} $ CAD</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : chartViewMode === 'microservices' ? (
             /* 3 Graphiques distincts pour chaque Micro-Service avec sa force de modèle */
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
               {squadChartData.map((sq, i) => {
                 const singleServiceData = [
-                  { name: 'CA Brut', montant: sq.caBrut, fill: '#06b6d4' },
-                  { name: 'Net Michael', montant: sq.netMichael, fill: '#10b981' },
-                  { name: 'Force Modèle', montant: sq.pertesEvitees, fill: '#a855f7' },
+                  { name: '1. CA Brut', montant: sq.caBrut, fill: '#06b6d4' },
+                  { name: '2. Net Michael', montant: sq.netMichael, fill: '#10b981' },
+                  { name: `3. Force ${sq.modelBadge}`, montant: sq.pertesEvitees, fill: '#a855f7' },
                 ];
 
                 const microModelInfo = [
@@ -560,7 +699,7 @@ export const PnLTelemetryTable: React.FC<PnLTelemetryTableProps> = ({
                   <Bar
                     dataKey="FinOps Matrix"
                     stackId="a"
-                    fill="#8b5cf6"
+                    fill="#64748b"
                     radius={[4, 4, 0, 0]}
                     maxBarSize={48}
                   />
