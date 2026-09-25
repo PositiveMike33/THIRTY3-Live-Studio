@@ -50,14 +50,6 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Zone 2 : Liens de navigation propres */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-400">
           <button
-            onClick={() => onNavigateSection('milestone')}
-            className={`transition-colors hover:text-white ${
-              activeSection === 'milestone' ? 'text-cyan-400 font-semibold' : ''
-            }`}
-          >
-            Palier 510,75 $
-          </button>
-          <button
             onClick={() => onNavigateSection('pnl')}
             className={`transition-colors hover:text-white ${
               activeSection === 'pnl' ? 'text-cyan-400 font-semibold' : ''
@@ -79,7 +71,7 @@ export const Header: React.FC<HeaderProps> = ({
               activeSection === 'squads' ? 'text-cyan-400 font-semibold' : ''
             }`}
           >
-            Les 3 Escouades
+            Trio Marketing & Escouades
           </button>
           <button
             onClick={() => onNavigateSection('looker')}
@@ -95,14 +87,14 @@ export const Header: React.FC<HeaderProps> = ({
               activeSection === 'audio' ? 'text-cyan-400 font-semibold' : ''
             }`}
           >
-            Soundtrack
+            Annonce Réseaux
           </button>
         </nav>
 
         {/* Zone 3 : Actions directes (GitHub, Looker, Docs) */}
         <div className="flex items-center gap-2.5 shrink-0">
           <a
-            href="https://github.com/mikegauthierguillet"
+            href="https://github.com/PositiveMike33/THIRTY3-Live-Studio"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-300 bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 rounded-md transition-colors"

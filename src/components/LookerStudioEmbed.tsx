@@ -205,20 +205,60 @@ export const LookerStudioEmbed: React.FC<LookerStudioEmbedProps> = ({ telemetry 
             })}
           </div>
 
-          {/* Table récapitulative des métriques exportables */}
-          <div className="p-4 rounded-lg bg-slate-950/60 border border-slate-800/80">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs mb-3">
-              <span className="font-semibold text-slate-300 flex items-center gap-2">
-                <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
-                Structure des colonnes injectées dans Google Sheets & Looker Studio
-              </span>
-              <span className="font-mono-tabular text-slate-500">
-                Endpoint actif : <code>/api/v1/mcp-microservices/telemetry/looker-csv</code>
-              </span>
+          {/* Schéma de données exécutif pour Looker Studio & Google Sheets */}
+          <div className="p-5 rounded-lg bg-slate-950/70 border border-slate-800/90">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs mb-4">
+              <div>
+                <span className="font-semibold text-slate-200 flex items-center gap-2">
+                  <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+                  Spécification du Contrat de Télémétrie (Pipeline Looker / Sheets)
+                </span>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  Synchronisation bidirectionnelle sans rupture de schéma (David Parnas Invariant).
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-mono-tabular text-[11px] text-slate-400 px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
+                  GET /telemetry/looker-csv
+                </span>
+                <button
+                  onClick={handleCopyFormula}
+                  className="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-850 text-cyan-300 border border-slate-700/80 text-xs font-medium transition-colors"
+                >
+                  {copied ? 'Copié' : 'Copier formule'}
+                </button>
+              </div>
             </div>
 
-            <div className="bg-slate-900/80 rounded-lg p-3 font-mono-tabular text-xs text-slate-300 overflow-x-auto whitespace-pre">
-              {engineApi.generateCSV()}
+            {/* Grille de champs propre et compacte */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+              {[
+                { col: 'Escouade_ID', type: 'string', desc: 'Identifiant étanche (ex: sovereign-mcp)' },
+                { col: 'CA_Brut_CAD', type: 'currency', desc: 'Chiffre d’affaires total brut (CAD)' },
+                { col: 'Provisions_Fiscales', type: 'currency', desc: '14,975% TPS/TVQ + 12,20% PME' },
+                { col: 'Net_Michael_CAD', type: 'currency', desc: 'Solde net direct disponible' },
+                { col: 'Pertes_Evitees_ToT', type: 'currency', desc: 'Valeur sauvée par auto-guérison' },
+                { col: 'Taux_Succes_ToT', type: 'percentage', desc: 'Fiabilité Sentinel (> 99.7%)' },
+                { col: 'Commandes_Livrees', type: 'integer', desc: 'Volume de missions validées' },
+                { col: 'Date_Extraction', type: 'ISO-8601', desc: 'Horodatage UTC scellé' },
+                { col: 'Format_Pipeline', type: 'RFC-4180', desc: 'Compatible =IMPORTDATA()' },
+                { col: 'Statut_Moteur', type: 'boolean', desc: 'Tier 0 Colibrì MoE Mesh' },
+              ].map((field) => (
+                <div
+                  key={field.col}
+                  className="p-2.5 rounded-md bg-slate-900/70 border border-slate-800/80 hover:border-slate-700/80 transition-colors"
+                >
+                  <div className="font-mono-tabular text-xs font-semibold text-cyan-300 truncate">
+                    {field.col}
+                  </div>
+                  <div className="text-[10px] text-emerald-400 font-mono-tabular mt-0.5">
+                    {field.type}
+                  </div>
+                  <div className="text-[11px] text-slate-400 mt-1 leading-snug line-clamp-2">
+                    {field.desc}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

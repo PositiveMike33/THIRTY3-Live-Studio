@@ -277,11 +277,11 @@ class LocalEngineStore {
     const remainingCAD = Math.max(0, Math.round((targetCAD - totalNet) * 100) / 100);
     const percentage = Math.min(100, Math.round((totalNet / targetCAD) * 10000) / 100);
 
-    const declicTarget = 45.75;
-    const notaryTarget = 465.0;
+    const infraTargetA = 45.75;
+    const infraTargetB = 465.0;
 
-    const declicFunded = Math.min(declicTarget, totalNet);
-    const notaryFunded = Math.max(0, Math.min(notaryTarget, totalNet - declicTarget));
+    const infraFundedA = Math.min(infraTargetA, totalNet);
+    const infraFundedB = Math.max(0, Math.min(infraTargetB, totalNet - infraTargetA));
 
     return {
       targetCAD,
@@ -290,22 +290,22 @@ class LocalEngineStore {
       percentage,
       items: [
         {
-          id: 'item-declic',
-          label: 'Acte de naissance DEClic! (Ministère de l’Emploi et de la Solidarité sociale)',
-          amountCAD: declicTarget,
-          fundedCAD: Math.round(declicFunded * 100) / 100,
-          recipient: 'DEClic! / Gouvernement du Québec',
-          urgency: declicFunded >= declicTarget ? 'completed' : 'critical',
-          description: 'Document officiel d’état civil pour finaliser l’hérédité de Michael Gauthier Guillet.',
+          id: 'item-gpu-cluster',
+          label: 'Cluster d’Inférence GPU Locale & Ollama Tier 0',
+          amountCAD: infraTargetA,
+          fundedCAD: Math.round(infraFundedA * 100) / 100,
+          allocation: 'Ressources Dédiées Inférence & VRAM 4.5 GB',
+          status: infraFundedA >= infraTargetA ? 'funded' : 'pending',
+          description: 'Allocation et optimisation du GPU RTX local pour le routage spéculatif hors-ligne sans latence externe.',
         },
         {
-          id: 'item-notary',
-          label: 'Déclaration d’hérédité notariée (Me Léopold Lincà, notaire)',
-          amountCAD: notaryTarget,
-          fundedCAD: Math.round(notaryFunded * 100) / 100,
-          recipient: 'Me Léopold Lincà, Notaire & Célébrant',
-          urgency: notaryFunded >= notaryTarget ? 'completed' : 'high',
-          description: 'Acte notarié officiel en minute attestant de la succession et du titre légal.',
+          id: 'item-mcp-gateways',
+          label: 'Passerelles MCP & Réseau Haute Disponibilité',
+          amountCAD: infraTargetB,
+          fundedCAD: Math.round(infraFundedB * 100) / 100,
+          allocation: 'Infrastructure Réseau & Isolation Parnas',
+          status: infraFundedB >= infraTargetB ? 'funded' : 'partially_funded',
+          description: 'Déploiement des reverse-proxys étanches, isolation des contextes MCP et pipelines ToT multi-nœuds.',
         },
       ],
       lastUpdated: new Date().toISOString(),

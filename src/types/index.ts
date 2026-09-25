@@ -8,8 +8,8 @@ export interface MilestoneBreakdownItem {
   label: string;
   amountCAD: number;
   fundedCAD: number;
-  recipient: string;
-  urgency: 'high' | 'critical' | 'completed';
+  allocation: string;
+  status: 'funded' | 'partially_funded' | 'pending';
   description: string;
 }
 

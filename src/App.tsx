@@ -8,7 +8,6 @@
 import React, { useEffect } from 'react';
 import { useThirty3Store } from './store/useThirty3Store';
 import { Header } from './components/Header';
-import { MilestoneProgress } from './components/MilestoneProgress';
 import { PnLTelemetryTable } from './components/PnLTelemetryTable';
 import { RecursiveHealingWidget } from './components/RecursiveHealingWidget';
 import { SquadsShowcase } from './components/SquadsShowcase';
@@ -27,7 +26,6 @@ import {
   Cpu,
   TrendingUp,
   Radio,
-  FileCheck,
   CheckCircle2,
 } from 'lucide-react';
 
@@ -140,11 +138,11 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() => scrollToSection('milestone')}
-                  className="px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-emerald-500/50 text-xs font-semibold transition-all flex items-center gap-2"
+                  onClick={() => scrollToSection('squads')}
+                  className="px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-emerald-500/50 text-xs font-semibold transition-all flex items-center gap-2 group"
                 >
-                  <FileCheck className="w-4 h-4 text-emerald-400" />
-                  <span>Palier Légal 510,75 $</span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                  <span>Trio Marketing & Conversion (Actif en Background)</span>
                 </button>
               </div>
             </div>
@@ -185,16 +183,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* 1. JAUGE ANIMÉE DU PALIER LÉGAL (510,75 $ CAD) */}
-        {telemetry && (
-          <section id="milestone">
-            <MilestoneProgress
-              milestone={telemetry.milestone}
-              onContributeClick={() => scrollToSection('squads')}
-            />
-          </section>
-        )}
-
         {/* 2. TABLEAU DE BORD FINANCIER PNL EN DIRECT */}
         {telemetry && (
           <section id="pnl">
@@ -221,7 +209,7 @@ export default function App() {
           <LookerStudioEmbed telemetry={telemetry} />
         </section>
 
-        {/* 6. BANDE SONORE ORIGINALE (4:53) */}
+        {/* 6. ANNONCE OFFICIELLE RÉSEAUX SOCIAUX & AUDIO BROADCAST */}
         <section id="audio">
           <AudioPlayerSection />
         </section>
@@ -244,8 +232,18 @@ export default function App() {
               </p>
             </div>
 
-            {/* Réinitialisation de démo */}
+            {/* Actions Footer */}
             <div className="flex items-center gap-3">
+              <a
+                href="https://github.com/PositiveMike33/THIRTY3-Live-Studio"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-850 border border-slate-800 text-slate-300 hover:text-white transition-colors"
+              >
+                <span>GitHub Repo</span>
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+              </a>
+
               <button
                 onClick={resetDefaults}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-850 border border-slate-800 text-slate-300 hover:text-white transition-colors"

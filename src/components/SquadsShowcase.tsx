@@ -26,7 +26,7 @@ export const SquadsShowcase: React.FC = () => {
   const [copiedPhone, setCopiedPhone] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<'CAD' | 'EUR' | 'USD'>('CAD');
 
-  const { recordSale } = useThirty3Store();
+  const { recordSale, telemetry } = useThirty3Store();
 
   const handleCopy = (text: string, type: 'email' | 'phone') => {
     navigator.clipboard.writeText(text);
@@ -80,6 +80,34 @@ export const SquadsShowcase: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* Tâche de Fond : Amortissement d'Infrastructure R&D (Actif en Background) */}
+      {telemetry?.milestone && (
+        <div className="p-3.5 rounded-lg bg-slate-950/80 border border-slate-800/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-inner">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+            <span className="text-slate-300 font-medium">
+              Pipeline Background : <strong>Amortissement R&D Cluster Souverain</strong>
+            </span>
+            <span className="text-slate-500 hidden sm:inline">·</span>
+            <span className="text-slate-400 font-mono-tabular">
+              {telemetry.milestone.currentNetCAD.toFixed(2)} $ / {telemetry.milestone.targetCAD.toFixed(2)} $ CAD ({telemetry.milestone.percentage.toFixed(1)}%)
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3 self-end sm:self-auto">
+            <div className="w-32 sm:w-40 h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+              <div
+                className="h-full bg-gradient-to-r from-cyan-500 to-emerald-400 rounded-full transition-all duration-500"
+                style={{ width: `${telemetry.milestone.percentage}%` }}
+              />
+            </div>
+            <span className="font-mono-tabular text-emerald-400 font-bold text-[11px]">
+              {telemetry.milestone.remainingCAD > 0 ? `Reste : ${telemetry.milestone.remainingCAD.toFixed(2)} $` : '100% Bouclé'}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Grille des 3 Cartes Néomorphiques des Escouades avec animations fluides */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
