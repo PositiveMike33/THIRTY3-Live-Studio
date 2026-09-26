@@ -54,14 +54,14 @@ export const RecursiveHealingWidget: React.FC = () => {
         </div>
 
         {/* Contrôles de simulation */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
-            <span className="text-xs text-slate-400">Escouade cible :</span>
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3">
+          <div className="flex items-center justify-between sm:justify-start gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+            <span className="text-xs text-slate-400 shrink-0">Escouade cible :</span>
             <select
               value={selectedSquad}
               onChange={(e) => setSelectedSquad(e.target.value as SquadId)}
               disabled={isHealingSimulating}
-              className="bg-slate-900 border border-slate-700/80 rounded px-2 py-1 text-slate-200 text-xs focus:ring-1 focus:ring-cyan-500"
+              className="bg-slate-900 border border-slate-700/80 rounded px-2 py-1 text-slate-200 text-xs focus:ring-1 focus:ring-cyan-500 w-full sm:w-auto"
             >
               <option value="cogniflow">CogniFlow Systems (@CogniFlowSystems)</option>
               <option value="finops-matrix">FinOps Matrix (@FinOpsMatrix)</option>
@@ -69,13 +69,13 @@ export const RecursiveHealingWidget: React.FC = () => {
             </select>
           </div>
 
-          <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
-            <span className="text-xs text-slate-400">Enjeu financier :</span>
+          <div className="flex items-center justify-between sm:justify-start gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+            <span className="text-xs text-slate-400 shrink-0">Enjeu financier :</span>
             <select
               value={selectedLossCAD}
               onChange={(e) => setSelectedLossCAD(Number(e.target.value))}
               disabled={isHealingSimulating}
-              className="bg-slate-900 border border-slate-700/80 rounded px-2 py-1 text-slate-200 text-xs font-mono-tabular focus:ring-1 focus:ring-cyan-500"
+              className="bg-slate-900 border border-slate-700/80 rounded px-2 py-1 text-slate-200 text-xs font-mono-tabular focus:ring-1 focus:ring-cyan-500 w-full sm:w-auto"
             >
               <option value={195.0}>195,00 $ CAD (Commande B2B)</option>
               <option value={310.0}>310,00 $ CAD (Batch ETL)</option>
@@ -86,7 +86,7 @@ export const RecursiveHealingWidget: React.FC = () => {
           <button
             onClick={handleTrigger}
             disabled={isHealingSimulating}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-xs transition-all shadow-md ${
+            className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-xs transition-all shadow-md min-h-[44px] w-full sm:w-auto ${
               isHealingSimulating
                 ? 'bg-cyan-950 text-cyan-400 border border-cyan-800/80 cursor-wait'
                 : 'bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 shadow-[0_0_15px_rgba(56,189,248,0.25)] hover:shadow-[0_0_20px_rgba(56,189,248,0.4)]'

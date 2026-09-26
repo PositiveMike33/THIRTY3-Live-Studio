@@ -115,29 +115,29 @@ export const LookerStudioEmbed: React.FC<LookerStudioEmbedProps> = ({ telemetry 
       </div>
 
       {/* Onglets Vue Interactive vs Iframe */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <button
             onClick={() => setActiveTab('visualizer')}
-            className={`flex items-center gap-2 pb-2 text-xs font-semibold border-b-2 transition-colors ${
+            className={`flex items-center gap-2 pb-2 text-xs font-semibold border-b-2 transition-colors min-h-[38px] ${
               activeTab === 'visualizer'
                 ? 'border-cyan-400 text-cyan-300'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
             <PieChart className="w-3.5 h-3.5" />
-            <span>Vue Analytique Executive Native</span>
+            <span>Vue Analytique Native</span>
           </button>
           <button
             onClick={() => setActiveTab('iframe')}
-            className={`flex items-center gap-2 pb-2 text-xs font-semibold border-b-2 transition-colors ${
+            className={`flex items-center gap-2 pb-2 text-xs font-semibold border-b-2 transition-colors min-h-[38px] ${
               activeTab === 'iframe'
                 ? 'border-cyan-400 text-cyan-300'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
             <FileSpreadsheet className="w-3.5 h-3.5" />
-            <span>Iframe Google Looker Studio Embed</span>
+            <span>Iframe Looker Studio</span>
           </button>
         </div>
 

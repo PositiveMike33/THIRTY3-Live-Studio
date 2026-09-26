@@ -243,22 +243,23 @@ export const SquadsShowcase: React.FC = () => {
 
       {/* MODAL DE COMMANDE FRICTION ZÉRO */}
       {selectedGig && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden p-6 space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-4 sm:p-6 space-y-4 sm:space-y-5 max-h-[92vh] overflow-y-auto">
             {/* Bouton de fermeture */}
             <button
               onClick={() => setSelectedGig(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+              aria-label="Fermer la modal"
             >
               <X className="w-5 h-5" />
             </button>
 
             {/* En-tête Modal */}
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-cyan-400 mb-1">
+            <div className="pr-10">
+              <div className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-cyan-400 mb-1">
                 Rails Transactionnels Friction Zéro · Michael Gauthier Guillet
               </div>
-              <h3 className="font-display font-bold text-lg text-white">
+              <h3 className="font-display font-bold text-base sm:text-lg text-white">
                 Finaliser la commande : {selectedGig.title}
               </h3>
               <p className="text-xs text-slate-400 mt-1">
@@ -317,10 +318,10 @@ export const SquadsShowcase: React.FC = () => {
             {/* Option 2 : Stripe Link & Plateformes Freelance */}
             <div className="space-y-2">
               <div className="text-xs font-semibold text-slate-400">Option 2 : Carte bancaire & Plateformes</div>
-              <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                 <a
                   href={`mailto:mikegauthierguillet@gmail.com?subject=Commande%20Stripe%20Link%20${encodeURIComponent(selectedGig.title)}&body=Bonjour%20Michael,%20je%20souhaite%20recevoir%20le%20lien%20Stripe%20Link%20pour%20${encodeURIComponent(selectedGig.title)}.`}
-                  className="flex items-center justify-center gap-1.5 p-2.5 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 transition-colors"
+                  className="flex items-center justify-center gap-1.5 p-2.5 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 transition-colors min-h-[44px]"
                 >
                   <CreditCard className="w-3.5 h-3.5 text-cyan-400" />
                   <span>Stripe Link 1-clic</span>
@@ -330,7 +331,7 @@ export const SquadsShowcase: React.FC = () => {
                   href={selectedGig.comeupUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-1.5 p-2.5 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 transition-colors"
+                  className="flex items-center justify-center gap-1.5 p-2.5 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 transition-colors min-h-[44px]"
                 >
                   <span>ComeUp Profil</span>
                   <ExternalLink className="w-3 h-3 text-slate-400" />
@@ -339,11 +340,11 @@ export const SquadsShowcase: React.FC = () => {
             </div>
 
             {/* Bouton de simulation de test immédiat */}
-            <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs">
-              <span className="text-slate-500">Pour démonstration instantanée :</span>
+            <div className="pt-2 border-t border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 text-xs">
+              <span className="text-slate-500 text-[11px]">Pour démonstration instantanée :</span>
               <button
                 onClick={() => handleSimulateDirectOrder(selectedGig)}
-                className="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold transition-colors"
+                className="px-4 py-2.5 rounded bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold transition-colors min-h-[44px] flex items-center justify-center"
               >
                 Simuler Paiement ({selectedGig.priceCAD} $ CAD)
               </button>

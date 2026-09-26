@@ -1,6 +1,6 @@
 import React from 'react';
 import { FinancialMilestone } from '../types';
-import { CheckCircle2, AlertCircle, Server, Cpu, Network, Sparkles, ArrowRight } from 'lucide-react';
+import { CheckCircle2, AlertCircle, FileCheck2, Scale, Sparkles, ArrowRight } from 'lucide-react';
 
 interface MilestoneProgressProps {
   milestone: FinancialMilestone;
@@ -19,25 +19,25 @@ export const MilestoneProgress: React.FC<MilestoneProgressProps> = ({
       <div className="absolute -top-24 -right-24 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* En-tête du Palier d'Infrastructure Opérationnelle */}
+      {/* En-tête du Baromètre d'Objectif Financier Urgent */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 relative z-10">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-cyan-400 mb-1">
-            <Server className="w-4 h-4 text-cyan-400" />
-            <span>Invariant Opérationnel 01 · Budget d'Infrastructure & Cluster R&D</span>
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400 mb-1">
+            <Scale className="w-4 h-4 text-amber-400" />
+            <span>Invariant Financier 01 · Baromètre d'Objectif Urgent (510,75 $ CAD)</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-display font-bold text-white tracking-tight">
-            Amortissement Cluster Dédié & Passerelles Réseau (510,75 $ CAD)
+            Baromètre d'Atteinte : Acte DEClic! (45,75 $) + Déclaration Me Lincà (465,00 $)
           </h2>
-          <p className="text-sm text-slate-400 mt-1 max-w-2xl">
-            Auto-financement complet de l'infrastructure de calcul local GPU RTX et des reverse-proxys MCP étanches
-            par les prestations des 3 escouades. Déduction fiscale stricte de 27,175% réservée en continu.
+          <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl leading-relaxed">
+            Financement direct par les prestations des 3 escouades. Déduction fiscale stricte de 27,175% réservée en continu
+            pour dégager le bénéfice net exact requis pour l'acte de naissance DEClic! et la déclaration d'hérédité notariée.
           </p>
         </div>
 
         {/* Métrique principale */}
-        <div className="flex items-baseline md:items-end flex-col bg-slate-950/70 border border-slate-800/80 px-4 py-3 rounded-lg">
-          <div className="text-xs text-slate-400 font-medium">Bénéfice Net Réinvesti</div>
+        <div className="flex items-baseline md:items-end flex-col bg-slate-950/70 border border-slate-800/80 px-4 py-3 rounded-lg shrink-0">
+          <div className="text-xs text-slate-400 font-medium">Bénéfice Net Réalisé</div>
           <div className="flex items-baseline gap-2">
             <span className="font-mono-tabular text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
               {currentNetCAD.toFixed(2)} $
@@ -47,11 +47,11 @@ export const MilestoneProgress: React.FC<MilestoneProgressProps> = ({
           <div className="text-xs font-mono-tabular text-slate-400 mt-0.5">
             {remainingCAD > 0 ? (
               <span className="text-amber-400 font-medium">
-                Reste à financer : <span className="font-bold">{remainingCAD.toFixed(2)} $ CAD</span> ({percentage.toFixed(1)}%)
+                Reste à combler : <span className="font-bold">{remainingCAD.toFixed(2)} $ CAD</span> ({percentage.toFixed(1)}%)
               </span>
             ) : (
               <span className="text-emerald-400 font-medium flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3" /> Budget d'infrastructure 100% bouclé
+                <CheckCircle2 className="w-3 h-3" /> Objectif 510,75 $ CAD 100% atteint
               </span>
             )}
           </div>
@@ -59,8 +59,8 @@ export const MilestoneProgress: React.FC<MilestoneProgressProps> = ({
       </div>
 
       {/* Barre de Progression Principale */}
-      <div className="relative mb-8 z-10">
-        <div className="h-4 w-full bg-slate-950 rounded-full overflow-hidden border border-slate-800 p-0.5">
+      <div className="relative mb-6 sm:mb-8 z-10">
+        <div className="h-3.5 sm:h-4 w-full bg-slate-950 rounded-full overflow-hidden border border-slate-800 p-0.5">
           <div
             className="h-full rounded-full bg-gradient-to-r from-cyan-500 via-teal-400 to-emerald-400 transition-all duration-700 ease-out shadow-[0_0_15px_rgba(52,211,153,0.5)] relative"
             style={{ width: `${Math.min(100, Math.max(2, percentage))}%` }}
@@ -70,17 +70,17 @@ export const MilestoneProgress: React.FC<MilestoneProgressProps> = ({
           </div>
         </div>
 
-        {/* Marqueurs sur la barre */}
-        <div className="flex justify-between items-center text-xs text-slate-500 font-mono-tabular mt-2">
+        {/* Marqueurs sur la barre (Adaptés mobile) */}
+        <div className="flex flex-wrap sm:flex-nowrap justify-between items-center gap-1 text-[10px] sm:text-xs text-slate-500 font-mono-tabular mt-2">
           <span>0,00 $</span>
-          <span className="text-slate-400 font-medium">45,75 $ (Tier 0 GPU Opérationnel)</span>
-          <span className="text-cyan-400 font-semibold">{percentage.toFixed(2)}% amorti</span>
-          <span>510,75 $ CAD</span>
+          <span className="text-slate-400 font-medium hidden sm:inline">Palier 1 : DEClic! (45,75 $)</span>
+          <span className="text-cyan-400 font-semibold">{percentage.toFixed(1)}% financé</span>
+          <span className="text-amber-300 font-bold">510,75 $ CAD (Total Urgent)</span>
         </div>
       </div>
 
       {/* Décomposition des deux postes d'infrastructure */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4 relative z-10">
         {items.map((item, index) => {
           const itemPct = Math.min(100, Math.round((item.fundedCAD / item.amountCAD) * 1000) / 10);
           const isComplete = item.fundedCAD >= item.amountCAD;
@@ -88,13 +88,13 @@ export const MilestoneProgress: React.FC<MilestoneProgressProps> = ({
           return (
             <div
               key={item.id}
-              className={`p-4 rounded-lg border transition-all duration-300 hover:border-slate-600 ${
+              className={`p-3.5 sm:p-4 rounded-lg border transition-all duration-300 hover:border-slate-600 ${
                 isComplete
                   ? 'bg-emerald-950/20 border-emerald-800/40 text-slate-200'
                   : 'bg-slate-950/60 border-slate-800 text-slate-300'
               }`}
             >
-              <div className="flex items-start justify-between gap-3 mb-2">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-3 mb-2">
                 <div className="flex items-center gap-2.5">
                   <div
                     className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border ${
@@ -103,24 +103,24 @@ export const MilestoneProgress: React.FC<MilestoneProgressProps> = ({
                         : 'bg-cyan-500/20 border-cyan-500/40 text-cyan-400'
                     }`}
                   >
-                    {index === 0 ? <Cpu className="w-4 h-4" /> : <Network className="w-4 h-4" />}
+                    {index === 0 ? <FileCheck2 className="w-4 h-4" /> : <Scale className="w-4 h-4" />}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-sm text-white">{item.label}</h3>
-                    <span className="text-[11px] text-slate-400 font-mono-tabular">{item.allocation}</span>
+                    <h3 className="font-semibold text-xs sm:text-sm text-white">{item.label}</h3>
+                    <span className="text-[10px] sm:text-[11px] text-slate-400 font-mono-tabular">{item.allocation}</span>
                   </div>
                 </div>
 
-                <span className="font-mono-tabular text-xs font-bold px-2 py-0.5 rounded bg-slate-900 border border-slate-700/60 text-slate-200 shrink-0">
+                <span className="font-mono-tabular text-[11px] sm:text-xs font-bold px-2 py-0.5 rounded bg-slate-900 border border-slate-700/60 text-slate-200 self-start sm:self-auto shrink-0">
                   {item.fundedCAD.toFixed(2)} $ / {item.amountCAD.toFixed(2)} $ CAD
                 </span>
               </div>
 
-              <p className="text-xs text-slate-400 mb-3 ml-9">{item.description}</p>
+              <p className="text-xs text-slate-400 mb-2.5 sm:ml-9">{item.description}</p>
 
-              <div className="ml-9">
-                <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
-                  <span>Statut : <strong className={isComplete ? 'text-emerald-400' : 'text-cyan-300'}>{isComplete ? 'Déployé & Opérationnel' : 'En cours d\'allocation'}</strong></span>
+              <div className="sm:ml-9">
+                <div className="flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400 mb-1">
+                  <span>Statut : <strong className={isComplete ? 'text-emerald-400' : 'text-cyan-300'}>{isComplete ? 'Déployé' : 'En cours'}</strong></span>
                   <span className="font-mono-tabular font-semibold text-slate-300">{itemPct.toFixed(1)}%</span>
                 </div>
                 <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden">

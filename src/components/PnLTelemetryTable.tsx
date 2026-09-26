@@ -280,34 +280,34 @@ export const PnLTelemetryTable: React.FC<PnLTelemetryTableProps> = ({
 
       {/* Cartes récapitulatives PnL */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-        <div className="p-3 sm:p-4 rounded-lg bg-slate-950/70 border border-slate-800">
+        <div className="p-3 sm:p-4 rounded-lg bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
           <div className="text-[11px] sm:text-xs text-slate-400 font-medium mb-0.5 sm:mb-1">Commandes Livrées</div>
-          <div className="font-mono-tabular text-xl sm:text-2xl font-bold text-white flex items-baseline gap-1 sm:gap-1.5">
+          <div className="font-mono-tabular text-lg sm:text-xl lg:text-2xl font-bold text-white flex items-baseline gap-1 sm:gap-1.5 truncate">
             {summary.totalOrders}
             <span className="text-[10px] sm:text-xs text-emerald-400 font-normal">validées</span>
           </div>
           <div className="text-[10px] sm:text-[11px] text-slate-500 mt-0.5 sm:mt-1 truncate">Par les 3 escouades</div>
         </div>
 
-        <div className="p-3 sm:p-4 rounded-lg bg-slate-950/70 border border-slate-800">
+        <div className="p-3 sm:p-4 rounded-lg bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
           <div className="text-[11px] sm:text-xs text-slate-400 font-medium mb-0.5 sm:mb-1">Chiffre d'Affaires Brut</div>
-          <div className="font-mono-tabular text-xl sm:text-2xl font-bold text-cyan-300">
+          <div className="font-mono-tabular text-lg sm:text-xl lg:text-2xl font-bold text-cyan-300 truncate">
             {summary.totalGrossCAD.toFixed(2)} $
           </div>
           <div className="text-[10px] sm:text-[11px] text-slate-500 mt-0.5 sm:mt-1 truncate">Total encaissé (30j)</div>
         </div>
 
-        <div className="p-3 sm:p-4 rounded-lg bg-slate-950/70 border border-slate-800">
+        <div className="p-3 sm:p-4 rounded-lg bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
           <div className="text-[11px] sm:text-xs text-slate-400 font-medium mb-0.5 sm:mb-1">Taxes (27,175%)</div>
-          <div className="font-mono-tabular text-xl sm:text-2xl font-bold text-amber-400">
+          <div className="font-mono-tabular text-lg sm:text-xl lg:text-2xl font-bold text-amber-400 truncate">
             {summary.totalTaxesCAD.toFixed(2)} $
           </div>
           <div className="text-[10px] sm:text-[11px] text-slate-500 mt-0.5 sm:mt-1 truncate">TPS/TVQ + PME</div>
         </div>
 
-        <div className="p-3 sm:p-4 rounded-lg bg-slate-950/70 border border-emerald-900/40 bg-gradient-to-br from-emerald-950/20 to-slate-950">
+        <div className="p-3 sm:p-4 rounded-lg bg-slate-950/70 border border-emerald-900/40 bg-gradient-to-br from-emerald-950/20 to-slate-950 flex flex-col justify-between">
           <div className="text-[11px] sm:text-xs text-emerald-400 font-medium mb-0.5 sm:mb-1">Bénéfice Net Michael</div>
-          <div className="font-mono-tabular text-xl sm:text-2xl font-bold text-emerald-300">
+          <div className="font-mono-tabular text-lg sm:text-xl lg:text-2xl font-bold text-emerald-300 truncate">
             {summary.totalNetCAD.toFixed(2)} $
           </div>
           <div className="text-[10px] sm:text-[11px] text-emerald-400/80 mt-0.5 sm:mt-1 truncate">Net direct disponible</div>
