@@ -15,6 +15,12 @@ import {
   Calendar,
   Layers,
   Sparkles,
+  ChevronDown,
+  ChevronUp,
+  Cpu,
+  Terminal,
+  CheckCircle2,
+  Zap,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -44,9 +50,33 @@ export const PnLTelemetryTable: React.FC<PnLTelemetryTableProps> = ({
   const [showAllColumnsMobile, setShowAllColumnsMobile] = useState(false);
   const [hasScrolledRight, setHasScrolledRight] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [expandedSquadIds, setExpandedSquadIds] = useState<Record<string, boolean>>({});
   const [chartViewMode, setChartViewMode] = useState<
     'squads' | 'ca_brut' | 'microservices' | 'timeline'
   >('squads');
+
+  const toggleSquadExpand = (squadId: string) => {
+    setExpandedSquadIds((prev) => ({
+      ...prev,
+      [squadId]: !prev[squadId],
+    }));
+  };
+
+  const { squads, summary } = telemetry;
+
+  const allExpanded = squads.length > 0 && squads.every((sq) => !!expandedSquadIds[sq.id]);
+
+  const toggleAllExpanded = () => {
+    if (allExpanded) {
+      setExpandedSquadIds({});
+    } else {
+      const nextState: Record<string, boolean> = {};
+      squads.forEach((sq) => {
+        nextState[sq.id] = true;
+      });
+      setExpandedSquadIds(nextState);
+    }
+  };
 
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -89,8 +119,6 @@ export const PnLTelemetryTable: React.FC<PnLTelemetryTableProps> = ({
       };
     }
   }, [telemetry, showAllColumnsMobile]);
-
-  const { squads, summary } = telemetry;
 
   // Données Recharts 1 : Répartition directe du CA Brut par escouade (30 derniers jours)
   const squadChartData = squads.map((sq) => {
@@ -894,8 +922,26 @@ export const PnLTelemetryTable: React.FC<PnLTelemetryTableProps> = ({
           </span>
         </div>
 
-        {/* Bascule mobile : Vue Priorisée vs Toutes les Colonnes */}
-        <div className="flex items-center gap-1.5">
+        {/* Contrôles du tableau : Déplier tout + Bascule colonnes mobile */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={toggleAllExpanded}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-950 hover:bg-slate-900 border border-slate-700/80 hover:border-cyan-500/50 text-[11px] text-cyan-300 font-medium transition-colors shadow-sm"
+            title="Déplier ou replier les technologies (primaryTech) et taux ToT de toutes les escouades"
+          >
+            {allExpanded ? (
+              <>
+                <ChevronUp className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Tout replier</span>
+              </>
+            ) : (
+              <>
+                <ChevronDown className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Déplier détails (Tech & ToT)</span>
+              </>
+            )}
+          </button>
+
           <button
             onClick={() => setShowAllColumnsMobile(!showAllColumnsMobile)}
             className="sm:hidden inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-950 hover:bg-slate-800 border border-slate-700/80 text-[11px] text-slate-300 font-medium transition-colors"
@@ -989,84 +1035,333 @@ export const PnLTelemetryTable: React.FC<PnLTelemetryTableProps> = ({
             </thead>
 
             <tbody className="divide-y divide-slate-800/80 font-mono-tabular">
-              {squads.map((squad) => (
-                <tr
-                  key={squad.id}
-                  className="hover:bg-slate-900/60 transition-colors group"
-                >
-                  {/* Colonne Escouade Fixée */}
-                  <td className="sticky left-0 z-20 bg-slate-950/98 backdrop-blur-md px-3 sm:px-4 py-3 font-medium text-white border-r border-slate-800/80 shadow-[2px_0_8px_rgba(0,0,0,0.4)]">
-                    <div className="flex flex-col">
-                      <span className="font-semibold font-display tracking-tight text-slate-100 truncate">
-                        {squad.name}
-                      </span>
-                      <span className="text-[10px] text-slate-400 truncate">
-                        @{squad.handle}
-                      </span>
-                      {/* Micro-badge de succès ToT sur mobile */}
-                      <span className="text-[10px] text-emerald-400 font-mono-tabular lg:hidden mt-0.5">
-                        {squad.totSuccessRate.toFixed(1)}% ToT
-                      </span>
-                    </div>
-                  </td>
+              {squads.map((squad) => {
+                const isExpanded = !!expandedSquadIds[squad.id];
+                const isSovereign = squad.id === 'sovereign-mcp';
+                const isCogniFlow = squad.id === 'cogniflow';
+                const accentBorderColor = isSovereign
+                  ? 'border-l-cyan-400'
+                  : isCogniFlow
+                  ? 'border-l-emerald-400'
+                  : 'border-l-purple-400';
+                const accentBadgeBg = isSovereign
+                  ? 'bg-cyan-950/80 border-cyan-800/60 text-cyan-300'
+                  : isCogniFlow
+                  ? 'bg-emerald-950/80 border-emerald-800/60 text-emerald-300'
+                  : 'bg-purple-950/80 border-purple-800/60 text-purple-300';
+                const accentText = isSovereign
+                  ? 'text-cyan-400'
+                  : isCogniFlow
+                  ? 'text-emerald-400'
+                  : 'text-purple-400';
 
-                  {/* Commandes */}
-                  <td className="px-3 sm:px-4 py-3 text-center text-slate-300 font-bold whitespace-nowrap">
-                    {squad.ordersDelivered}
-                  </td>
+                const architecturePrincipleDesc = isSovereign
+                  ? 'David Parnas Information Hiding (1972) · Isolation étanche des contextes, masquage strict des états internes & zéro fuite de tokens maîtres.'
+                  : isCogniFlow
+                  ? 'Tree-of-Thought (ToT) Recursive Loop · Arbre exploratoire de pensée à 3 branches avec auto-guérison immédiate et scellement cryptographique SHA-256.'
+                  : 'Speculative Mixture-of-Agents Router · Passerelle intelligente arbitrant requêtes simples sur RTX 4050 local et requêtes complexes sur LLMs cloud optimisés (-73% coûts).';
 
-                  {/* Chiffre d'Affaires Brut */}
-                  <td className="px-3 sm:px-4 py-3 text-right font-bold text-white whitespace-nowrap">
-                    {squad.grossRevenueCAD.toFixed(2)} $
-                  </td>
-
-                  {/* Taxes combinées (27,175%) */}
-                  <td
-                    className={`px-3 sm:px-4 py-3 text-right text-amber-400/90 whitespace-nowrap ${
-                      showAllColumnsMobile ? '' : 'hidden md:table-cell'
-                    }`}
-                  >
-                    -{squad.reservedTaxesCAD.toFixed(2)} $
-                  </td>
-
-                  {/* Net Michael */}
-                  <td className="px-3 sm:px-4 py-3 text-right font-bold text-emerald-300 bg-emerald-950/20 whitespace-nowrap border-x border-emerald-900/30">
-                    {squad.netMichaelCAD.toFixed(2)} $
-                  </td>
-
-                  {/* Pertes Évitées ToT */}
-                  <td
-                    className={`px-3 sm:px-4 py-3 text-right text-cyan-400 whitespace-nowrap ${
-                      showAllColumnsMobile ? '' : 'hidden sm:table-cell'
-                    }`}
-                  >
-                    +{squad.lossesAvoidedCAD.toFixed(2)} $
-                  </td>
-
-                  {/* Taux de succès ToT */}
-                  <td
-                    className={`px-3 sm:px-4 py-3 text-center whitespace-nowrap ${
-                      showAllColumnsMobile ? '' : 'hidden lg:table-cell'
-                    }`}
-                  >
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                      <ShieldCheck className="w-3 h-3" />
-                      {squad.totSuccessRate.toFixed(1)}%
-                    </span>
-                  </td>
-
-                  {/* Bouton de simulation +1 vente */}
-                  <td className="px-3 sm:px-4 py-3 text-right whitespace-nowrap">
-                    <button
-                      onClick={() => handleQuickAddSale(squad.id, 65)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-cyan-400 hover:text-cyan-300 bg-cyan-950/60 hover:bg-cyan-900/60 border border-cyan-800/60 hover:border-cyan-600 rounded transition-all"
-                      title="Simuler une commande client (+65 CAD)"
+                return (
+                  <React.Fragment key={squad.id}>
+                    <tr
+                      className={`transition-colors group ${
+                        isExpanded ? 'bg-slate-900/90' : 'hover:bg-slate-900/60'
+                      }`}
                     >
-                      <span>+1 Vente</span>
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                      {/* Colonne Escouade Fixée avec bouton d'expansion */}
+                      <td className="sticky left-0 z-20 bg-slate-950/98 backdrop-blur-md px-3 sm:px-4 py-3 font-medium text-white border-r border-slate-800/80 shadow-[2px_0_8px_rgba(0,0,0,0.4)]">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => toggleSquadExpand(squad.id)}
+                            aria-label={
+                              isExpanded
+                                ? `Replier les détails de ${squad.name}`
+                                : `Déplier les technologies et taux ToT de ${squad.name}`
+                            }
+                            title={
+                              isExpanded
+                                ? 'Replier le détail'
+                                : 'Déplier : Technologies (primaryTech) et Succès ToT'
+                            }
+                            className="p-1 -ml-1 rounded hover:bg-slate-800 text-slate-400 hover:text-cyan-300 transition-colors shrink-0"
+                          >
+                            <ChevronDown
+                              className={`w-4 h-4 transition-transform duration-200 ${
+                                isExpanded ? 'rotate-180 text-cyan-400' : 'text-slate-400'
+                              }`}
+                            />
+                          </button>
+                          <div
+                            onClick={() => toggleSquadExpand(squad.id)}
+                            className="flex flex-col cursor-pointer select-none min-w-0"
+                          >
+                            <span className="font-semibold font-display tracking-tight text-slate-100 group-hover:text-cyan-300 transition-colors truncate">
+                              {squad.name}
+                            </span>
+                            <span className="text-[10px] text-slate-400 truncate">
+                              @{squad.handle}
+                            </span>
+                            {/* Micro-badge de succès ToT sur mobile */}
+                            <span className="text-[10px] text-emerald-400 font-mono-tabular lg:hidden mt-0.5">
+                              {squad.totSuccessRate.toFixed(1)}% ToT
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Commandes */}
+                      <td className="px-3 sm:px-4 py-3 text-center text-slate-300 font-bold whitespace-nowrap">
+                        {squad.ordersDelivered}
+                      </td>
+
+                      {/* Chiffre d'Affaires Brut */}
+                      <td className="px-3 sm:px-4 py-3 text-right font-bold text-white whitespace-nowrap">
+                        {squad.grossRevenueCAD.toFixed(2)} $
+                      </td>
+
+                      {/* Taxes combinées (27,175%) */}
+                      <td
+                        className={`px-3 sm:px-4 py-3 text-right text-amber-400/90 whitespace-nowrap ${
+                          showAllColumnsMobile ? '' : 'hidden md:table-cell'
+                        }`}
+                      >
+                        -{squad.reservedTaxesCAD.toFixed(2)} $
+                      </td>
+
+                      {/* Net Michael */}
+                      <td className="px-3 sm:px-4 py-3 text-right font-bold text-emerald-300 bg-emerald-950/20 whitespace-nowrap border-x border-emerald-900/30">
+                        {squad.netMichaelCAD.toFixed(2)} $
+                      </td>
+
+                      {/* Pertes Évitées ToT */}
+                      <td
+                        className={`px-3 sm:px-4 py-3 text-right text-cyan-400 whitespace-nowrap ${
+                          showAllColumnsMobile ? '' : 'hidden sm:table-cell'
+                        }`}
+                      >
+                        +{squad.lossesAvoidedCAD.toFixed(2)} $
+                      </td>
+
+                      {/* Taux de succès ToT */}
+                      <td
+                        className={`px-3 sm:px-4 py-3 text-center whitespace-nowrap ${
+                          showAllColumnsMobile ? '' : 'hidden lg:table-cell'
+                        }`}
+                      >
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                          <ShieldCheck className="w-3 h-3" />
+                          {squad.totSuccessRate.toFixed(1)}%
+                        </span>
+                      </td>
+
+                      {/* Actions : Toggle Détails + Simulation Vente */}
+                      <td className="px-3 sm:px-4 py-3 text-right whitespace-nowrap">
+                        <div className="inline-flex items-center gap-1.5 justify-end">
+                          <button
+                            onClick={() => toggleSquadExpand(squad.id)}
+                            className={`px-2 py-1 text-xs font-semibold rounded border transition-all ${
+                              isExpanded
+                                ? 'bg-cyan-950/90 text-cyan-300 border-cyan-700/80 shadow-sm'
+                                : 'bg-slate-900 text-slate-400 hover:text-slate-200 border-slate-700/80 hover:border-slate-600'
+                            }`}
+                            title={
+                              isExpanded
+                                ? 'Fermer le détail'
+                                : 'Afficher les technologies (primaryTech) et le taux ToT'
+                            }
+                          >
+                            {isExpanded ? 'Fermer' : 'Détails'}
+                          </button>
+                          <button
+                            onClick={() => handleQuickAddSale(squad.id, 65)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-cyan-400 hover:text-cyan-300 bg-cyan-950/60 hover:bg-cyan-900/60 border border-cyan-800/60 hover:border-cyan-600 rounded transition-all"
+                            title="Simuler une commande client (+65 CAD)"
+                          >
+                            <span>+1 Vente</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+
+                    {/* VUE DÉTAILLÉE EXPANDABLE : TECHNOLOGIES (primaryTech) & TAUX DE SUCCÈS ToT SPÉCIFIQUE */}
+                    {isExpanded && (
+                      <tr className="bg-slate-950/98 border-y-2 border-slate-800/90 animate-fadeIn">
+                        <td colSpan={8} className="p-0">
+                          <div
+                            className={`p-4 sm:p-6 border-l-4 ${accentBorderColor} bg-gradient-to-r from-slate-950 via-slate-900/80 to-slate-950 space-y-4`}
+                          >
+                            {/* En-tête de l'escouade avec rôle et architecte */}
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800/90">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="font-bold text-white text-sm sm:text-base flex items-center gap-2">
+                                  <span>{squad.name}</span>
+                                  <span className="text-xs font-mono text-slate-400 font-normal">
+                                    @{squad.handle}
+                                  </span>
+                                </span>
+                                <span
+                                  className={`text-[10px] font-mono-tabular font-bold px-2 py-0.5 rounded-full border ${accentBadgeBg}`}
+                                >
+                                  {squad.roleTitle}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 text-xs text-slate-400">
+                                <span className="text-slate-500">Architecte Référent :</span>
+                                <span className="text-slate-200 font-semibold font-mono">
+                                  {squad.leadArchitect}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Deux colonnes d'analyse détaillée : primaryTech + totSuccessRate */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {/* 1. TECHNOLOGIES UTILISÉES (primaryTech) */}
+                              <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800/90 space-y-3 shadow-inner">
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-cyan-400">
+                                    <Cpu className="w-4 h-4 text-cyan-400 shrink-0" />
+                                    <span>Technologies Utilisées (primaryTech)</span>
+                                  </div>
+                                  <span className="text-[10px] font-mono-tabular font-bold px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-300">
+                                    {squad.primaryTech.length} composants
+                                  </span>
+                                </div>
+
+                                <p className="text-xs text-slate-300 leading-relaxed">
+                                  {squad.description}
+                                </p>
+
+                                {/* Badges de chaque technologie de primaryTech */}
+                                <div>
+                                  <div className="text-[10px] uppercase font-mono tracking-wider text-slate-400 mb-1.5 font-semibold">
+                                    Stack Technologique Officielle :
+                                  </div>
+                                  <div className="flex flex-wrap gap-2">
+                                    {squad.primaryTech.map((tech) => (
+                                      <span
+                                        key={tech}
+                                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-950 border border-slate-700/80 hover:border-cyan-500/50 text-xs font-mono text-cyan-200 transition-colors shadow-sm"
+                                      >
+                                        <Terminal className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                                        <span className="font-medium">{tech}</span>
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                {/* Principe architectural invariant */}
+                                <div className="pt-2 border-t border-slate-800/80">
+                                  <div className="text-[10px] text-slate-400 leading-relaxed flex items-start gap-1.5">
+                                    <Zap className={`w-3.5 h-3.5 ${accentText} shrink-0 mt-0.5`} />
+                                    <span>
+                                      <strong className="text-slate-200 font-semibold">
+                                        Règle d'Architecture :{' '}
+                                      </strong>
+                                      {architecturePrincipleDesc}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* 2. TAUX DE SUCCÈS ToT SPÉCIFIQUE À L'ESCOUADE */}
+                              <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800/90 space-y-3 shadow-inner flex flex-col justify-between">
+                                <div>
+                                  <div className="flex items-center justify-between gap-2 mb-2">
+                                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400">
+                                      <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                                      <span>Taux de Succès ToT Spécifique</span>
+                                    </div>
+                                    <span className="text-[10px] font-mono-tabular font-bold px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-800/60 text-emerald-300">
+                                      Invariant 01 · Auto-Guérison
+                                    </span>
+                                  </div>
+
+                                  <div className="flex items-baseline justify-between mb-2">
+                                    <div>
+                                      <div className="flex items-baseline gap-2">
+                                        <span className="font-mono-tabular text-3xl sm:text-4xl font-extrabold text-emerald-400 tracking-tight">
+                                          {squad.totSuccessRate.toFixed(1)}%
+                                        </span>
+                                        <span className="text-xs text-slate-400 font-medium">
+                                          taux de succès ToT validé
+                                        </span>
+                                      </div>
+                                      <div className="text-[11px] text-slate-400 mt-0.5">
+                                        Résolution autonome récursive en moins de 3 passes.
+                                      </div>
+                                    </div>
+                                    <div className="text-right">
+                                      <span className="text-[10px] text-slate-500 uppercase font-mono block">
+                                        Pertes Évitées
+                                      </span>
+                                      <span className="font-mono-tabular text-sm sm:text-base font-bold text-cyan-300">
+                                        +{squad.lossesAvoidedCAD.toFixed(2)} $ CAD
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  {/* Jauge visuelle de succès ToT */}
+                                  <div className="space-y-1 my-3">
+                                    <div className="w-full bg-slate-950 rounded-full h-3 p-0.5 border border-slate-800 overflow-hidden">
+                                      <div
+                                        className="h-full rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 transition-all duration-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                                        style={{ width: `${Math.min(100, squad.totSuccessRate)}%` }}
+                                      />
+                                    </div>
+                                    <div className="flex items-center justify-between text-[10px] font-mono-tabular text-slate-500">
+                                      <span>Seuil SLA : 99.0%</span>
+                                      <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                                        <CheckCircle2 className="w-3 h-3 text-emerald-400 inline shrink-0" />
+                                        <span>Excellence Opérationnelle ({squad.totSuccessRate.toFixed(1)}%)</span>
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Les 3 Paliers Récursifs de l'arbre Tree-of-Thought */}
+                                <div className="pt-2 border-t border-slate-800/80">
+                                  <div className="text-[10px] uppercase font-mono tracking-wider text-slate-400 mb-1.5 font-semibold">
+                                    Boucle Récursive 3-Retry de cette escouade :
+                                  </div>
+                                  <div className="grid grid-cols-3 gap-1.5 text-[10px] font-mono-tabular">
+                                    <div className="bg-slate-950 p-2 rounded border border-slate-800 text-center">
+                                      <div className="text-slate-500 text-[9px] uppercase">
+                                        Passe 1
+                                      </div>
+                                      <div className="text-cyan-300 font-bold">Architect</div>
+                                      <div className="text-[9px] text-slate-400 mt-0.5">
+                                        Diag &lt; 20ms
+                                      </div>
+                                    </div>
+                                    <div className="bg-slate-950 p-2 rounded border border-slate-800 text-center">
+                                      <div className="text-slate-500 text-[9px] uppercase">
+                                        Passe 2
+                                      </div>
+                                      <div className="text-purple-300 font-bold">Commando</div>
+                                      <div className="text-[9px] text-slate-400 mt-0.5">
+                                        Patch idempotent
+                                      </div>
+                                    </div>
+                                    <div className="bg-slate-950 p-2 rounded border border-slate-800 text-center">
+                                      <div className="text-slate-500 text-[9px] uppercase">
+                                        Passe 3
+                                      </div>
+                                      <div className="text-emerald-400 font-bold">Sentinel</div>
+                                      <div className="text-[9px] text-slate-400 mt-0.5">
+                                        Scellement SHA
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })}
             </tbody>
 
             {/* Total général */}

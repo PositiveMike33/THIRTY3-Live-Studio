@@ -10,6 +10,7 @@ import { useThirty3Store } from './store/useThirty3Store';
 import { Header } from './components/Header';
 import { MilestoneProgress } from './components/MilestoneProgress';
 import { PnLTelemetryTable } from './components/PnLTelemetryTable';
+import { NetRevenueEvolutionChart } from './components/NetRevenueEvolutionChart';
 import { RecursiveHealingWidget } from './components/RecursiveHealingWidget';
 import { SquadsShowcase } from './components/SquadsShowcase';
 import { FAQSection } from './components/FAQSection';
@@ -236,6 +237,8 @@ export default function App() {
               onRefreshTelemetry={fetchTelemetry}
               onSimulateSale={(squadId, amount) => recordSale(squadId, amount)}
             />
+            {/* Visualisation Recharts : Évolution du CA Net par escouade */}
+            <NetRevenueEvolutionChart telemetry={telemetry} />
           </section>
         )}
 
